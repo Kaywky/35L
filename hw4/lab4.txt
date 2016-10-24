@@ -1,0 +1,135 @@
+Lab
+1. get a copy of the Diffutils
+"git clone git://git.savannah.gnu.org/diffutils.git"
+
+2. "git log > git-log.txt"
+
+3. "git tag > git-tags.txt"
+
+4. 
+1) "emacs git-log.txt", then use C-s to search for the commit, and then copy and paste "62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f" into Linux shell;
+2) "git format-patch -1 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f" to create a patch file, then rename it as quote-patch.txt
+
+5. check out version 3.0
+"git checkout v3.0"
+Then it shows like that:
+You are in 'detached HEAD'...... HEAD is now at 002d5c... version 3.0
+
+6. apply patch
+"patch -p1 < quote-patch.txt"
+In some cases, I am asked to choose "file to patch" and I just skip them.
+
+7.check what happened
+"git status"
+It shows all the modified and untracked files:
+# HEAD detached at v3.0
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#       modified:   NEWS
+#       modified:   README
+#       modified:   TODO
+#       modified:   doc/diagmeet.note
+#       modified:   ms/config.bat
+#       modified:   ms/config.site
+#       modified:   po/en.po
+#       modified:   src/analyze.c
+#       modified:   src/cmp.c
+#       modified:   src/context.c
+#       modified:   src/diff.c
+#       modified:   src/diff.h
+#       modified:   src/diff3.c
+#       modified:   src/dir.c
+#       modified:   src/ifdef.c
+#       modified:   src/io.c
+#       modified:   src/sdiff.c
+#       modified:   src/side.c
+#       modified:   src/system.h
+#       modified:   src/util.c
+#       modified:   tests/help-version
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       #git-log.txt#
+#       NEWS.orig
+#       README-hacking.orig
+#       README-hacking.rej
+#       README.orig
+#       README.rej
+#       cfg.mk.orig
+#       cfg.mk.rej
+#       git-log.txt
+#       git-tags.txt
+#       ms/config.site.orig
+#       quote-patch.txt
+#       src/cmp.c.orig
+#       src/context.c.orig
+#       src/diff.c.orig
+#       src/diff.c.rej
+#       src/diff.h.orig
+#       src/diff3.c.orig
+#       src/diff3.c.rej
+#       src/dir.c.orig
+#       src/sdiff.c.orig
+#       src/system.h.orig
+#       src/util.c.orig
+#       tests/help-version.orig
+no changes added to commit (use "git add" and/or "git commit -a")
+
+8. learn to use different functions in Emacs's diff vc mode and diff mode 
+
+9. revert changes to .c files and undo changes to .c files
+1) use emacs to get into NEWS, README, TODO, ./doc/diagmeet.note, ./ms/config.bat, ./ms/config.site, ./po/en.po, ./src/diff.h, ./src/system.h, ./tests/help-version files, then use C-x v u to revert all the changes to these files
+2) use emacs to get into ./src/analyze.c, ./src/cmp.c, ./src/context.c, ./src/diff.c, ./src/diff3.c, ./src/dir.c, ./src/ifdef.c, ./src/io.c, ./src/sdiff.c, ./src/side.c, ./src/util.c files, then use C-x v = to show changes, then move cursor to certain changes and use "C-u C-c C-a" to undo the hunk;
+
+10. copy rejected patches into the corresponding .c files as needed
+use emacs to get into diff.c.rej and diff3.c.rej, all rejected patches should be applied into diff.c and diff3.c, so I manually change diff.c and diff3.c 
+
+11. remove untracked files
+first I use "git clean -fd -n" to check the files will be cleaned, it corresponds to untracked files list; so I use "git clean -f" to remove them
+
+12. 
+1) "git status"
+# HEAD detached at v3.0
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#       modified:   src/cmp.c
+#       modified:   src/diff.c
+#       modified:   src/diff3.c
+#       modified:   src/dir.c
+#       modified:   src/sdiff.c
+#       modified:   src/util.c
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+
+2) "git diff > quote-3.0-patch.txt" to output a patch
+
+13. 
+1) get additional patch
+"curl http://web.cs.ucla.edu/classes/fall16/cs35L/assign/diffutils-gets.diff > addpatch"
+2) "./bootstrp" It first retunrs an error: help2man not found, so I use command "export PATH=/usr/local/cs/bin:$PATH", and then "./bootstrap", it works.
+3) apply the patch
+"patch -p0 < addpatch"
+4) build the resulting modified version of Diffutils
+"./configure"
+"make"
+"make check"
+5) "diff . -" It shows: diff: cannot compare '-' to a directory
+6) "diff --help" It also gives right quotes
+
+14.
+1) make directories
+"mkdir diffutils-3.0" and "mkdir diffutils-3.0-patch" 
+2) cope two kinds of source code to directories
+"cp ~/hw4/compare/diffutils/src/*.c ./diffutils-3.0" and "cp ./src/*c ./diffutils-3.0-patch"
+3) compare the source codes
+"./src/diff -pru diffutils-3.0 diffutils-3.0-patch > quote-3.0-test.txt"
+
+15 compare the contents of two diff report
+"diff -u quote-3.0-test.txt quote-3.0-patch.txt"
+It shows that there are a lot of differences but most of them are comment and quote differences; the differences are innocuous
+
