@@ -1,0 +1,19 @@
+Q1. 
+Line "case_long_iso_time_style" is just a label for "goto" command. Maybe Brady removes it to reduce the chance back to this label and thus not to do the execute statement.
+But I think it is not necessary to remove this line because it actually doesn't influence anything, it is just a label. Even if it is removed, the "case" and the execute statement are still here.
+
+Q2.
+If there's no translation function, I think the patched version may cause confusion in countries where users don't understand English. Meanwhile, there may exist some situations under which users need the "2009-03-02 06:22" version, maybe for data collection. So changing to the traditional Unix format without flexibility may cause problems.
+
+Q3. 
+When the script is invoked on an empty file, it invokes some empty lines rather than error.
+
+Q4. 
+When I run randline.py.2 with Python3, it shows the following error:
+  File "randline.py.2", line 65
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+It is because there is some different standard between Python3 and Python2. In Python3, the correct way of output IOError is:
+except OSError as err:
+       parser.error("OS error: {0}".format(err))

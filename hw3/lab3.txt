@@ -1,0 +1,47 @@
+step1: grab Coreutils 7.6
+use wget command to grab
+"wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz"
+
+step2: compile and install
+1) decompress the .tar.gz file
+"tar -zxvf coreutils-7.6.tar.gz"
+2) compile and install
+"cd coreutils-7.6" (get into the folder)
+"./configure --prefix=/u/ee/grad/kaiyi/lab3" (executing configure file to check the environment and set the install path)
+"make" (compile)
+"make install" (install)
+
+step3: reproduce the bug on my machine
+1) change the locale setting
+"export LC_ALL='en_US.UTF-8'"
+2) get into the directory ../lab3/bin and check if the bug exist
+"./ls -l /bin/bash"
+it shows: -rwxr-xr-x 1 root root 960392 2016-07-12 08:17 /bin/bash
+
+step4: apply Brady's patch
+1) copy and paste Brady's patch to a file named patch.diff, change the path in first few lines to ./coreutils-7.6/src/ls.c 
+2) apply the patch file to change ls.c
+"patch -p1 < patch.diff" 
+when asked file to patch: 
+"./ls.c"
+then both hunks succeed.
+
+step5: compile the patched version
+back to ~/coreutils-7.6 directory, and "make" to compile the patched version
+
+step6: test
+1) in ~/coreutilis-7.6 directory, check if the patched ls command succeeds
+"./src/ls -l /bin/bash"
+it shows: -rwxr-xr-x 1 root root 960392 Jul 12 08:17 /bin/bash
+2) in ~/lab3 directory, check the difference between the old ls command and patched one
+"./bin/ls -l /bin/bash"
+it shows: -rwxr-xr-x 1 root root 960392 2016-07-12 08:17 /bin/bash
+3) using "touch" command to artficially mark file assign2.txt as being a year old
+"touch -t 201505181259 assign2.txt"
+4) unchanged ls command
+"./lab3/bin/ls -l ./assign2.txt"
+it shows: -rw-r--r-- 2 kaiyi usbmuxd 8668 2015-05-18 12:59 ./assign2.txt
+5) fixed ls command
+"./coreutils-7.6/src/ls -l ./assign2.txt"
+it shows: -rw-r--r-- 2 kaiyi usbmuxd 8668 May 18 2015 ./assign2.txt
+
