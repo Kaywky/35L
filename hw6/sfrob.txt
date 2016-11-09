@@ -1,0 +1,36 @@
+homework6:
+1. After I successfully rewrite sfrob program, I compile two programs.
+"gcc -std=c99 -o sfrobu sfrobu.c"
+"gcc -std=c99 -o sfrob sfrob.c"
+All succeed.
+
+2. modify a little in bigfile.c and use it to generate a big txt file with space.
+
+3.compare two programs
+1) sfrob with getchar() and putchar(): buffered
+time ./sfrob < bigfile2.txt > sfrobresult.txt
+
+real    0m2.514s
+user    0m2.393s
+sys     0m0.037s
+
+
+2) sfrobu with read() and write(): unbuffered
+time ./sfrobu < bigfile2.txt > sfroburesult.txt
+
+comparison number is: 104346285
+real    0m15.071s
+user    0m2.835s
+sys     0m12.151s
+
+4. shell script
+#! /bin/bash
+tr "wkyzqxhahafrswmlxixi" "frswmlxixiwkyzqxhaha" | sort | tr "frswmlxixiwkyzqxhaha" "wkyzqxhahafrswmlxixi"
+
+time ./sfrobs < bigfile2.txt > sfrobs.txt
+
+real    0m0.126s
+user    0m0.019s
+sys     0m0.039s
+
+From the three results above (with same input file bigfile2.txt), we can see that sfrobs is fastest and sfrobu is slowest.

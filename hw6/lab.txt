@@ -1,0 +1,124 @@
+
+lab6 1. I wrote two c program file in Sublime and then transfer them
+into server. And then I compile them. All succeed.  gcc -std=c99 -o
+tr2b tr2b.c gcc -std=c99 -o tr2u tr2u.c
+
+2.test my two c files with simple case
+1) echo "abcdef" > test.txt
+2) cat test.txt | ./tr2b "abc" "def"
+it returns: defdef
+3) cat test.txt | ./tr2u "abc" "def"
+it returns: defdef
+
+3.Code in bigfile.c, use for loop to generate a big file containing random letters
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main()
+{
+for (long int i=0; i<5000000; i++){
+    char a;
+    a = rand()%52;
+    if(a>25) a=a-25+'a';
+    else a=a+'A';
+    printf("%c",a);
+}
+return 0;
+}
+
+After compile this bigfile.c, use "./bigfile > bigtest.txt" to generate a big test file.
+
+4. strace
+a) copying one file to another
+"strace -c ./tr2b "k" "y" < bigtest.txt > result-tr2b.txt"
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 40.12    0.000193           3        77           write
+ 28.69    0.000138           2        79           read
+  9.98    0.000048           5         9           mmap
+  5.41    0.000026           7         4           mprotect
+  4.16    0.000020           5         4           fstat
+  2.91    0.000014           7         2           open
+  2.29    0.000011          11         1           execve
+  2.08    0.000010          10         1           munmap
+  1.66    0.000008           4         2           close
+  1.46    0.000007           7         1         1 access
+  0.62    0.000003           3         1           brk
+  0.62    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000481                   182         1 total
+
+"strace -c ./tr2u "k" "y" < bigtest.txt > result-tr2u.txt"
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.63    5.785090           1   5000001           write
+ 44.36    4.612871           1   5000002           read
+  0.01    0.000654         218         3           fstat
+  0.00    0.000038           5         8           mmap
+  0.00    0.000024           6         4           mprotect
+  0.00    0.000013           7         2           open
+  0.00    0.000010          10         1           munmap
+  0.00    0.000008           4         2           close
+  0.00    0.000006           6         1         1 access
+  0.00    0.000006           6         1           execve
+  0.00    0.000004           4         1           brk
+  0.00    0.000004           4         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   10.398728              10000027         1 total
+
+In this case, the buffered version program has much more fewer system calls. Meanwhile, the tr2u execute file takes much more time to finish the replace task.
+
+b) coping a file to terminal
+"strace -c ./tr2b "k" "y" < bigtest.txt"
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 90.61    0.004325           1      4883           write
+  6.22    0.000297           4        79           read
+  1.05    0.000050           6         9           mmap
+  0.57    0.000027           7         4           mprotect
+  0.40    0.000019           5         4           fstat
+  0.29    0.000014           7         2           open
+  0.23    0.000011          11         1           munmap
+  0.17    0.000008           8         1         1 access
+  0.15    0.000007           4         2           close
+  0.15    0.000007           7         1           execve
+  0.08    0.000004           4         1           brk
+  0.08    0.000004           4         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.004773                  4988         1 total
+
+"strace -c ./tr2u "k" "y" < bigtest.txt"
+V
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 57.87    6.224816           1   5000001           write
+ 42.13    4.532142           1   5000002           read
+  0.00    0.000044           6         8           mmap
+  0.00    0.000025           6         4           mprotect
+  0.00    0.000015           8         2           open
+  0.00    0.000011          11         1           munmap
+  0.00    0.000008           4         2           close
+  0.00    0.000008           3         3           fstat
+  0.00    0.000007           7         1         1 access
+  0.00    0.000006           6         1           execve
+  0.00    0.000004           4         1           brk
+  0.00    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   10.757089              10000027         1 total
+
+Also in this case, the buffered version program has much more fewer system calls. Meanwhile, the tr2u execute file takes much more time to finish the replace task.
+
+5. time
+"time ./tr2b "k" "y" < bigtest.txt"
+real  0m1.047s
+user  0m0.136s
+sys 0m0.033s
+
+"time ./tr2u "k" "y" < bigtest.txt"
+real  0m6.289s
+user  0m0.257s
+sys 0m5.985s
+
+From time command, we can see tr2b takes less time than tr2u.
+
